@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SLA Agility Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --panel: #ffffff;
+    --ink: #1a1d23;
+    --ink-soft: #4a5160;
+    --ink-mute: #6b7280;
+    --border: #e3e6eb;
+    --border-strong: #c9ced6;
+    --accent: #0f3a5c;
+    --accent-soft: #e8eef4;
+
+    --green-bg: #e8f5ec;  --green-bd: #2e7d4f;  --green-ink: #18532f;
+    --yellow-bg: #fff8e1; --yellow-bd: #c9a227; --yellow-ink: #6b5300;
+    --orange-bg: #fdecd9; --orange-bd: #d97a25; --orange-ink: #8a4612;
+    --red-bg: #fce8e6;    --red-bd: #c0392b;    --red-ink: #7a1f17;
+    --gray-bg: #eef0f3;   --gray-bd: #9aa3af;   --gray-ink: #3f4856;
+    --error-bg: #fde8e6;  --error-bd: #c0392b;  --error-ink: #7a1f17;
+    --fsa-bg: #eef5fa;    --fsa-bd: #5a8bb0;    --fsa-ink: #16405e;
+    --open-bg: #d9f0e0;   --open-dark: #18532f;
+    --closed-bg: #f8d7d2; --closed-dark: #7a1f17;
+    --tq-bg: #E0F2F1;     --tq-ink: #00695C;
+    --ops-bg: #E3F2FD;    --ops-ink: #1565C0;
+    --both-bg: #ECEFF1;   --both-ink: #455A64;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--ink);
+    line-height: 1.5; min-height: 100vh; padding: 24px 16px 64px;
+    transition: background-color 0.4s ease;
+  }
+  body.tint-green  { background: var(--green-bg); }
+  body.tint-yellow { background: var(--yellow-bg); }
+  body.tint-orange { background: var(--orange-bg); }
+  body.tint-red    { background: var(--red-bg); }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  /* ---- TOP-LEVEL TABS ---- */
+  .top-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+    background: var(--gray-bg); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 3px; margin-bottom: 20px;
+  }
+  .top-tab-btn {
+    appearance: none; border: 0; background: transparent; cursor: pointer;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    color: var(--ink-soft); padding: 11px 8px; border-radius: 6px;
+    text-align: center;
+  }
+  .top-tab-btn:hover { background: rgba(15,58,92,0.08); }
+  .top-tab-btn.active { background: var(--ink); color: #fff; }
+  .top-tab-panel { display: none; }
+  .top-tab-panel.active { display: block; }
+  @media (max-width: 640px) {
+    .top-tabs { grid-template-columns: 1fr; }
+  }
+
+  .ref-pointer { font-size: 12.5px; color: var(--ink-mute); margin: 10px 0 0; }
+  .no-sla-note {
+    background: var(--green-bg); border: 1px solid var(--green-bd); color: var(--green-ink);
+    border-radius: 6px; padding: 9px 12px; margin-bottom: 14px; font-size: 13px; font-weight: 600;
+  }
+  .link-btn {
+    appearance: none; border: 0; background: transparent; padding: 0;
+    font-family: inherit; font-size: inherit; font-weight: 700;
+    color: var(--accent); text-decoration: underline; cursor: pointer;
+  }
+
+  /* ---- HEADER ---- */
+  header.title {
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px;
+  }
+  header.title h1 { margin: 0; font-size: clamp(22px,4vw,30px); font-weight: 800; letter-spacing: -0.02em; }
+  header.title p { margin: 4px 0 0; color: var(--ink-mute); font-size: 14px; }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px; margin-bottom: 16px;
+  }
+  .card h2 {
+    margin: 0 0 14px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute);
+  }
+
+  /* ---- INPUTS ---- */
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .input-row { grid-template-columns: 1fr; } }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink-soft); }
+  .toggle {
+    display: grid; grid-template-columns: 1fr 1fr;
+    background: var(--gray-bg); border: 1px solid var(--border-strong);
+    border-radius: 6px; padding: 3px; gap: 3px;
+  }
+  .toggle button {
+    appearance: none; border: 0; background: transparent;
+    padding: 10px 8px; font-family: inherit; font-weight: 600; font-size: 14px;
+    color: var(--ink-soft); border-radius: 4px; cursor: pointer;
+  }
+  .toggle button.active { background: var(--ink); color: #fff; }
+  .toggle button[data-val="peak"].active { background: #135F96; }
+  .toggle button[data-val="nonpeak"].active { background: #008484; }
+  input[type="number"] {
+    width: 100%; font-family: inherit; font-size: 18px; font-weight: 600;
+    padding: 9px 12px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: #fff; color: var(--ink);
+  }
+  input[type="number"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  input[type="number"].invalid { border-color: var(--error-bd); background: #fff5f4; }
+  .pct-input-row { display: flex; align-items: center; gap: 10px; }
+  .pct-input-row input[type="number"] { flex: 1; }
+  .clear-link {
+    appearance: none; border: 0; background: transparent; padding: 4px 2px;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    color: var(--ink-mute); text-decoration: underline; cursor: pointer; flex-shrink: 0;
+  }
+  .clear-link:hover { color: var(--accent); }
+  .helper { font-size: 12px; color: var(--ink-mute); margin-top: 6px; }
+  .entered-at { font-size: 12px; color: var(--ink-mute); margin-top: 6px; font-weight: 600; }
+  .entered-at.stale { color: #8a5a00; background: #fff4d6; border: 1px solid #d4a017; border-radius: 4px; padding: 6px 9px; margin-top: 8px; }
+  .input-error {
+    margin-top: 8px; background: var(--error-bg); border: 1px solid var(--error-bd);
+    color: var(--error-ink); padding: 8px 10px; border-radius: 4px;
+    font-size: 13px; font-weight: 600; display: none;
+  }
+  .input-error.show { display: block; }
+
+  /* ---- COVERAGE ---- */
+  .window-rule {
+    background: #fff4d6; border: 1px solid #d4a017; color: #5a4200;
+    border-radius: 6px; padding: 10px 12px; margin-bottom: 14px;
+    font-size: 13px; line-height: 1.45; display: flex; align-items: flex-start; gap: 8px;
+  }
+  .window-rule-icon { font-size: 16px; flex-shrink: 0; line-height: 1.3; }
+
+  .escalation-note {
+    background: var(--accent-soft); border: 1px solid #c4d2e0; color: var(--accent);
+    border-radius: 6px; padding: 10px 12px; margin-bottom: 14px;
+    font-size: 13px; line-height: 1.45; display: flex; align-items: flex-start; gap: 8px;
+  }
+  .escalation-note-icon { font-size: 16px; flex-shrink: 0; line-height: 1.3; }
+  .coverage-now { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 720px) { .coverage-now { grid-template-columns: 1fr; } }
+  .who-card { background: var(--accent-soft); border: 1px solid #c4d2e0; border-radius: 6px; padding: 10px 12px; }
+  .who-card .role { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .who-card .name { font-size: 17px; font-weight: 700; margin-top: 2px; color: var(--ink); }
+  .who-card .time { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .who-card .note-sm { font-size: 11px; color: var(--ink-soft); margin-top: 4px; }
+  .who-card.outside { background: #f4f5f7; border-color: var(--border-strong); }
+  .who-card.outside .role { color: var(--ink-mute); }
+  .who-card.outside .name { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+
+  details.full-sched { margin-top: 8px; }
+  details.full-sched > summary { cursor: pointer; font-weight: 600; font-size: 13px; color: var(--accent); padding: 6px 0; }
+  .sched-section { margin-top: 18px; }
+  .sched-section h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); }
+  table.sched { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.sched th, table.sched td { border-bottom: 1px solid var(--border); padding: 7px 8px; text-align: left; vertical-align: top; }
+  table.sched th { background: #f8f9fb; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); }
+  table.sched tr.now { background: #fff7d9; }
+  table.sched tr.now td:first-child { font-weight: 700; color: #6b5300; }
+  .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .alt-note { font-size: 12px; color: var(--ink-mute); margin-top: 6px; }
+  .team-heading.team-tq { color: #00695C; }
+  .team-heading.team-ops { color: #1565C0; }
+
+  /* ---- CODE TABS (quick reference) ---- */
+  .code-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .code-tab {
+    appearance: none; border: 2px solid; background: transparent;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    padding: 7px 16px; border-radius: 100px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .code-tab.tab-green  { border-color: var(--green-bd);  color: var(--green-ink); }
+  .code-tab.tab-yellow { border-color: var(--yellow-bd); color: var(--yellow-ink); }
+  .code-tab.tab-orange { border-color: var(--orange-bd); color: var(--orange-ink); }
+  .code-tab.tab-red    { border-color: var(--red-bd);    color: var(--red-ink); }
+  .code-tab.tab-green.active  { background: var(--green-bg); }
+  .code-tab.tab-yellow.active { background: var(--yellow-bg); }
+  .code-tab.tab-orange.active { background: var(--orange-bg); }
+  .code-tab.tab-red.active    { background: var(--red-bg); }
+  .tab-panel { display: none; padding: 14px; border-radius: 8px; border: 2px solid; }
+  .tab-panel.visible { display: block; }
+  .tab-panel.panel-green  { background: var(--green-bg);  border-color: var(--green-bd);  color: var(--green-ink); }
+  .tab-panel.panel-yellow { background: var(--yellow-bg); border-color: var(--yellow-bd); color: var(--yellow-ink); }
+  .tab-panel.panel-orange { background: var(--orange-bg); border-color: var(--orange-bd); color: var(--orange-ink); }
+  .tab-panel.panel-red    { background: var(--red-bg);    border-color: var(--red-bd);    color: var(--red-ink); }
+  .tab-panel h4 { margin: 0 0 8px; font-size: 14px; font-weight: 800; }
+  .tab-panel ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+  .tab-panel ul li { margin-bottom: 3px; }
+  .tab-note { font-size: 12px; opacity: 0.8; margin-top: 8px; font-style: italic; }
+
+  /* ---- RESULT CARD ---- */
+  .result-card { border: 2px solid var(--border-strong); border-radius: 8px; padding: 0; overflow: hidden; background: var(--panel); margin-bottom: 16px; }
+  .result-banner {
+    padding: 14px 20px; border-bottom: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .result-banner .meta { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
+  .result-banner .code-line { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .result-banner .code { font-size: clamp(22px,4vw,28px); font-weight: 800; letter-spacing: -0.02em; }
+  .result-banner .range { font-size: 13px; font-weight: 500; }
+  .result-banner .leader-tag { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(0,0,0,0.12); padding: 4px 8px; border-radius: 100px; }
+  .result-body { padding: 20px; }
+
+  /* Resume at — elevated, right under code banner */
+  .resume-block {
+    background: var(--accent-soft); border: 1px solid #c4d2e0;
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .resume-block .resume-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+  .resume-block .resume-value { font-size: 18px; font-weight: 800; color: var(--accent); }
+
+  /* Window status pill — always visible above the result, non-blocking */
+  .window-status {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700;
+    padding: 9px 14px; border-radius: 6px; margin-bottom: 12px;
+    border: 1px solid;
+  }
+  .window-status-active   { background: var(--green-bg); color: var(--green-ink); border-color: var(--green-bd); }
+  .window-status-inactive { background: var(--red-bg);   color: var(--red-ink);   border-color: var(--red-bd); }
+
+  /* Senior line */
+  .senior-line { border-radius: 8px; padding: 16px 18px; display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; border: 2px solid; }
+  .senior-line.open  { background: var(--open-bg);   border-color: var(--green-bd); color: var(--open-dark); }
+  .senior-line.closed { background: var(--closed-bg); border-color: var(--red-bd);  color: var(--closed-dark); }
+  .senior-line .sl-icon { font-size: 26px; line-height: 1; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; font-weight: 700; }
+  .senior-line.open .sl-icon  { background: rgba(46,125,79,0.15); }
+  .senior-line.closed .sl-icon { background: rgba(192,57,43,0.15); }
+  .senior-line-body { flex: 1; min-width: 0; }
+  .senior-line .sl-label { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+  .senior-line .sl-status { font-size: 22px; font-weight: 800; line-height: 1.1; margin-top: 2px; }
+  .senior-line .sl-note { font-size: 13px; font-weight: 500; margin-top: 4px; opacity: 0.9; }
+  .senior-line .sl-ownership {
+    margin-top: 8px; padding: 8px 10px; background: rgba(255,255,255,0.55);
+    border-radius: 4px; font-size: 13px; font-weight: 600; line-height: 1.4;
+    display: flex; gap: 6px; align-items: flex-start;
+  }
+  .senior-line .sl-daily {
+    margin-top: 8px; padding: 8px 10px; background: #E8EEF4; color: #0F3A5C;
+    border-radius: 4px; font-size: 13px; font-weight: 600; line-height: 1.4;
+    display: flex; gap: 6px; align-items: flex-start;
+  }
+  .senior-line .sl-discretion {
+    margin-top: 8px; padding: 8px 10px; background: #F3F0FB; color: #4A3B78;
+    border-radius: 4px; font-size: 13px; font-weight: 600; line-height: 1.4;
+    display: flex; gap: 6px; align-items: flex-start;
+  }
+
+  /* Audience sections — now collapsible accordion items */
+  .audience-section { border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .audience-section.seniors  { background: #f3f0fb; border: 1px solid #8b6dba; }
+  .audience-section.fsa      { background: var(--fsa-bg); border: 1px solid var(--fsa-bd); }
+  .audience-section.leader   { background: #fafbfc; border: 1px solid var(--border-strong); }
+  .audience-tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 100px; }
+  .audience-section.seniors .audience-tag { background: #7c4dba; color: #fff; }
+  .audience-section.fsa     .audience-tag { background: var(--fsa-bd); color: #fff; }
+  .audience-section.leader  .audience-tag { background: var(--ink); color: #fff; }
+  .section-title { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
+  .section-blurb { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+
+  .msg-accordion-header {
+    width: 100%; border: 0; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 14px 18px; text-align: left; font-family: inherit;
+  }
+  .msg-accordion-headline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .msg-accordion-chevron { font-size: 13px; color: var(--ink-mute); transition: transform 0.15s; flex-shrink: 0; }
+  .audience-section.msg-accordion-item.open .msg-accordion-header { padding-bottom: 6px; }
+  .audience-section.msg-accordion-item.open .msg-accordion-chevron { transform: rotate(180deg); }
+  .msg-accordion-body { display: none; padding: 0 18px 16px; }
+  .audience-section.msg-accordion-item.open .msg-accordion-body { display: block; }
+
+  /* Message blocks */
+  .msg-block { margin-bottom: 12px; }
+  .msg-block:last-child { margin-bottom: 0; }
+  .msg-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .msg-label .label-text { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-mute); }
+  .copy-btn {
+    appearance: none; border: 1px solid var(--border-strong);
+    background: #fff; color: var(--ink-soft);
+    font-family: inherit; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 4px 10px; border-radius: 100px; cursor: pointer; transition: background 0.15s;
+  }
+  .copy-btn:hover { background: var(--gray-bg); }
+  .copy-btn.copied { background: var(--green-bg); color: var(--green-ink); border-color: var(--green-bd); }
+  .msg-box { background: #fff; border: 1px solid var(--border); border-left: 3px solid var(--ink); padding: 12px 14px; border-radius: 4px; font-size: 14px; white-space: pre-wrap; }
+  .audience-section.seniors .msg-box { border-left-color: #7c4dba; }
+  .audience-section.fsa     .msg-box { border-left-color: var(--fsa-bd); }
+  .msg-box.muted { color: var(--ink-mute); font-style: italic; font-size: 13px; }
+
+  /* Action steps — owner-grouped */
+  .actions-owner-group { margin-bottom: 16px; }
+  .actions-owner-group:last-child { margin-bottom: 0; }
+  .owner-group-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute);
+  }
+  .owner-pill {
+    display: inline-block; font-size: 10px; font-weight: 800;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+  }
+  .owner-tq   { background: var(--tq-bg);   color: var(--tq-ink); }
+  .owner-ops  { background: var(--ops-bg);  color: var(--ops-ink); }
+  .owner-both { background: var(--both-bg); color: var(--both-ink); }
+  ul.owner-actions { margin: 0; padding-left: 18px; font-size: 14px; }
+  ul.owner-actions li { margin-bottom: 5px; line-height: 1.45; }
+
+  .owner-key {
+    font-size: 12.5px; color: var(--ink-soft); background: #fafbfc;
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 8px 12px; margin: 6px 0 12px;
+    display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: center; line-height: 1.6;
+  }
+  .owner-key-label { font-weight: 700; color: var(--ink); margin-right: 4px; }
+
+  /* SOT template */
+  .template-box {
+    background: #fffbe6; border: 1px dashed var(--yellow-bd);
+    border-left: 3px solid var(--yellow-bd); padding: 10px 14px;
+    border-radius: 4px; font-size: 14px; color: #5b4500;
+  }
+
+  /* Procedures */
+  details.proc-details { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: #fafbfc; }
+  details.proc-details:last-child { margin-bottom: 0; }
+  details.proc-details summary { cursor: pointer; padding: 10px 14px; font-weight: 700; font-size: 14px; color: var(--ink); }
+  details.proc-details[open] summary { border-bottom: 1px solid var(--border); }
+  ul.proc-list { margin: 10px 14px 12px 32px; padding: 0; font-size: 14px; }
+  ul.proc-list li { margin-bottom: 6px; }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--ink-mute); font-size: 15px; }
+
+  /* Code color theming on banner */
+  .theme-green  { border-color: var(--green-bd); }
+  .theme-green  .result-banner { background: var(--green-bg);  color: var(--green-ink);  border-bottom-color: var(--green-bd); }
+  .theme-yellow { border-color: var(--yellow-bd); }
+  .theme-yellow .result-banner { background: var(--yellow-bg); color: var(--yellow-ink); border-bottom-color: var(--yellow-bd); }
+  .theme-orange { border-color: var(--orange-bd); }
+  .theme-orange .result-banner { background: var(--orange-bg); color: var(--orange-ink); border-bottom-color: var(--orange-bd); }
+  .theme-red    { border-color: var(--red-bd); }
+  .theme-red    .result-banner { background: var(--red-bg);    color: var(--red-ink);    border-bottom-color: var(--red-bd); }
+
+  .leader-context h3 { margin: 16px 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); }
+  .leader-context h3:first-child { margin-top: 0; }
+  .leader-context p { margin: 0 0 8px; font-size: 14.5px; }
+
+  .footer-note { font-size: 12px; color: var(--ink-mute); margin-top: 16px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     MAIN APP
+     ============================================================ -->
+<div class="wrap" id="mainApp">
+
+<header class="title">
+  <h1>SLA Agility Plan</h1>
+  <p>Enter the current SLA % to see leadership guidance, messaging, and coverage.</p>
+</header>
+
+<div class="top-tabs" role="tablist" aria-label="View">
+  <button type="button" id="tabbtn-live" class="top-tab-btn active" data-tab="live" role="tab" aria-selected="true" aria-controls="panel-live">Live Lookup</button>
+  <button type="button" id="tabbtn-quickref" class="top-tab-btn" data-tab="quickref" role="tab" aria-selected="false" aria-controls="panel-quickref">Code Quick Reference</button>
+  <button type="button" id="tabbtn-reference" class="top-tab-btn" data-tab="reference" role="tab" aria-selected="false" aria-controls="panel-reference">Schedule &amp; Procedures</button>
+</div>
+
+<div class="top-tab-panel active" id="panel-live" role="tabpanel" aria-labelledby="tabbtn-live">
+
+<!-- INPUTS -->
+<section class="card" id="sec-inputs">
+  <h2>Inputs</h2>
+  <div class="input-row">
+    <div class="field">
+      <label>Period</label>
+      <div class="toggle" id="periodToggle" role="group" aria-label="Period">
+        <button data-val="peak" class="active" aria-pressed="true">Peak (Jan / May / Aug)</button>
+        <button data-val="nonpeak" aria-pressed="false">Non-Peak</button>
+      </div>
+      <div class="helper">Peak months are January, May, and August. All other months are Non-Peak.</div>
+    </div>
+    <div class="field">
+      <label for="pctInput">Current SLA %</label>
+      <div class="pct-input-row">
+        <input id="pctInput" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 59.16" />
+        <button type="button" id="clearPctBtn" class="clear-link" style="display:none">Clear</button>
+      </div>
+      <div class="helper">From the OFS Queue Performance (Today by Hour) Five9 report — use the overall %rec at the bottom row. Must be between 0 and 100.</div>
+      <div class="input-error" id="inputError"></div>
+      <div class="entered-at" id="enteredAt" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- COVERAGE -->
+<section class="card" id="sec-coverage">
+  <h2>Coverage Schedule</h2>
+  <div class="coverage-now" id="coverageNow"></div>
+  <div class="window-rule">
+    <span class="window-rule-icon" aria-hidden="true">🕘</span>
+    <span><strong>Active window: 10:00 a.m. to 4:00 p.m.</strong> The SLA Agility Plan runs from 10:00 a.m. to 4:00 p.m. only. Directors are on duty during this window. No agility actions are taken and no staff are moved outside these hours.</span>
+  </div>
+  <div class="escalation-note">
+    <span class="escalation-note-icon" aria-hidden="true">📞</span>
+    <span><strong>Who calls the agility plan:</strong> If the Director on duty is out, the Assistant Dir Back Up calls the agility plan. If that person is also out, the Assistant Dir Back Up 2 calls the agility plan.</span>
+  </div>
+  <p class="ref-pointer">Action steps by code are in <button type="button" class="link-btn" data-goto-tab="quickref">Code Quick Reference</button>. Full schedule, team structure, and procedures are in <button type="button" class="link-btn" data-goto-tab="reference">Schedule &amp; Procedures</button>.</p>
+</section>
+
+<!-- RESULT -->
+<section id="sec-result">
+<section id="resultZone" aria-live="polite">
+  <div class="card empty">Enter a current SLA % above to see the code and guidance.</div>
+</section>
+</section>
+
+</div><!-- end #panel-live -->
+
+<div class="top-tab-panel" id="panel-quickref" role="tabpanel" aria-labelledby="tabbtn-quickref">
+
+<!-- CODE QUICK REFERENCE TABS -->
+<section class="card" id="sec-reference">
+  <h2>Code Quick Reference — Paused Activities</h2>
+  <p style="font-size:13px;color:var(--ink-mute);margin:0 0 12px">Click a code to see what is paused at that level. Activities are cumulative — higher codes include lower-code restrictions.</p>
+  <div class="no-sla-note" id="noSlaNote" style="display:none">No SLA % entered yet — showing Code Green as a default. Enter a % on Live Lookup to see the code that actually applies.</div>
+  <div class="code-tabs" id="codeTabs" role="tablist" aria-label="SLA codes">
+    <button class="code-tab tab-green"  data-tab="green"  role="tab" aria-selected="false" aria-controls="tabPanel-green">Code Green</button>
+    <button class="code-tab tab-yellow" data-tab="yellow" role="tab" aria-selected="false" aria-controls="tabPanel-yellow">Code Yellow</button>
+    <button class="code-tab tab-orange" data-tab="orange" role="tab" aria-selected="false" aria-controls="tabPanel-orange">Code Orange</button>
+    <button class="code-tab tab-red"    data-tab="red"    role="tab" aria-selected="false" aria-controls="tabPanel-red">Code Red</button>
+  </div>
+
+  <div id="tabPanel-green"  class="tab-panel panel-green"  role="tabpanel"></div>
+  <div id="tabPanel-yellow" class="tab-panel panel-yellow" role="tabpanel"></div>
+  <div id="tabPanel-orange" class="tab-panel panel-orange" role="tabpanel"></div>
+  <div id="tabPanel-red"    class="tab-panel panel-red"    role="tabpanel"></div>
+</section>
+
+</div><!-- end #panel-quickref -->
+
+<div class="top-tab-panel" id="panel-reference" role="tabpanel" aria-labelledby="tabbtn-reference">
+
+<!-- FULL SCHEDULE -->
+<section class="card" id="sec-full-schedule">
+  <h2>Full Coverage Schedule</h2>
+  <div class="sched-section">
+    <h3>Managing OFS Leadership Chat &amp; Informing FSAs</h3>
+    <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 12px">Announcing codes, responding to SLA questions in OFS Leadership, and announcing to FSAs in the High Volume Updates chat.</p>
+    <p style="font-weight:700;margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-mute)">Directors</p>
+    <div class="scroll-x"><table class="sched" id="dirTable"></table></div>
+    <p style="font-weight:700;margin:16px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-mute)">Assistant Dir Back Up</p>
+    <div class="scroll-x"><table class="sched" id="adBackupTable"></table></div>
+    <p style="font-weight:700;margin:16px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-mute)">Assistant Dir Back Up 2</p>
+    <div class="scroll-x"><table class="sched" id="adBackup2Table"></table></div>
+  </div>
+  <div class="sched-section">
+    <h3>Managing the Senior Chat</h3>
+    <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 12px">One Senior FSA is held out of the FSA queue to cover the Senior chat and cases during agility events. Leadership identifies who that is each hour. Grace and Akos back each other up across the two shifts below; the hourly AD names are called in only if both Associate Directors are out.</p>
+    <div class="scroll-x"><table class="sched" id="seniorChatTable"></table></div>
+    <div class="alt-note">* Alternative back-up if the AD listed has already served as a back-up within the day.</div>
+  </div>
+  <div class="sched-section">
+    <h3>Team Structure</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px">
+      <div>
+        <h3 class="team-heading team-tq" style="font-size:13px;text-transform:none;letter-spacing:0;margin:0 0 8px">Training and Quality (T&Q)</h3>
+        <div class="scroll-x">
+          <table class="sched">
+            <thead><tr><th>Name</th><th>Title</th><th>Team</th><th>Reports to</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Siesonn</strong></td><td>Director of T&Q</td><td>—</td><td>AVP</td></tr>
+              <tr><td><strong>Grace</strong></td><td>Associate Director</td><td>Seniors FSAs</td><td>Siesonn</td></tr>
+              <tr><td><strong>Akos</strong></td><td>Associate Director</td><td>Nesters / Onboarding</td><td>Siesonn</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 class="team-heading team-ops" style="font-size:13px;text-transform:none;letter-spacing:0;margin:0 0 8px">Operations (Ops)</h3>
+        <div class="scroll-x">
+          <table class="sched">
+            <thead><tr><th>Name</th><th>Title</th><th>Reports to</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Paige</strong></td><td>Director of Ops</td><td>AVP</td></tr>
+              <tr><td><strong>Francesca</strong></td><td>Director of Ops</td><td>AVP</td></tr>
+              <tr><td><strong>Katilynn</strong></td><td>Assistant Director</td><td>Paige</td></tr>
+              <tr><td><strong>Lisa</strong></td><td>Assistant Director</td><td>Paige</td></tr>
+              <tr><td><strong>Haby</strong></td><td>Assistant Director</td><td>Paige</td></tr>
+              <tr><td><strong>Marc</strong></td><td>Assistant Director</td><td>Francesca</td></tr>
+              <tr><td><strong>Sophia</strong></td><td>Assistant Director</td><td>Francesca</td></tr>
+              <tr><td><strong>Kandyss</strong></td><td>Assistant Director</td><td>Francesca</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCEDURES -->
+<section class="card" id="sec-procedures">
+  <h2>Procedures</h2>
+  <details class="proc-details">
+    <summary>Monitoring SLA</summary>
+    <ul class="proc-list">
+      <li>High Volume recorded IVR message is on during all Peaks.</li>
+      <li>After the first Five9 report email, the assigned Director and Associate/Assistant Director (per the schedule) must run the Five9 "OFS Queue Performance (Today by Hour)" report manually every 30 minutes — or more often — to verify SLA improvement.</li>
+    </ul>
+  </details>
+  <details class="proc-details">
+    <summary>Steps to notify the team</summary>
+    <ul class="proc-list">
+      <li>Directors notify their ADs via Teams chat.</li>
+      <li>Assistant Directors notify their FSAs via Teams chat.</li>
+      <li>Associate Directors notify their Seniors, Nesters &amp; Trainees via Teams chat.</li>
+      <li>Notify FSAs and Seniors of improved color status when the +5% buffer is met.</li>
+      <li>Escalation: Assigned Director &amp; Associate/Assistant Director &rarr; back-up 1: Unassigned Director &rarr; back-up 2: AVP posts the update to the OFS Leadership chat and the High Volume Updates channel.</li>
+    </ul>
+  </details>
+</section>
+
+</div><!-- end #panel-reference -->
+
+<p class="footer-note">This is the official tool for managing SLA Agility. The most recent Excel workbook can be used as a fallback reference if needed.</p>
+
+</div><!-- end #mainApp -->
+
+<script>
+/* ============================================================
+   RANGES
+   ============================================================ */
+const ranges = {
+  peak: [
+    { code: "green",  min: 65, max: 100 },
+    { code: "yellow", min: 55, max: 64  },
+    { code: "orange", min: 45, max: 54  },
+    { code: "red",    min: 0,  max: 44  }
+  ],
+  nonpeak: [
+    { code: "green",  min: 70, max: 100 },
+    { code: "yellow", min: 60, max: 69  },
+    { code: "orange", min: 50, max: 59  },
+    { code: "red",    min: 0,  max: 49  }
+  ]
+};
+
+const resumeAt = { green: "85% +", yellow: "70% +", orange: "60% +", red: "50% +" };
+
+const seniorLine = {
+  green:  { open: true,  routing: null, ownership: null, dailyRule: null, discretion: null },
+  yellow: { open: true,  routing: null, ownership: null, dailyRule: null, discretion: null },
+  orange: { open: false,
+    routing:   "FSAs: post Senior questions in the Senior chat. Do not have a student on the line when posting.",
+    ownership: "Closing or reopening this line is owned by Training and Quality Leadership. If unavailable, the decision opens up to other OFS leadership.",
+    dailyRule: "Daily 4:00 p.m. rule — Regardless of call volume, the Senior phone line must be reopened at 4:00 p.m. and Seniors return to supporting it. Resuming off-phone / project work depends on volume and business need, but the line itself reopens at 4:00 p.m.",
+    discretion: "Leadership discretion — Even if the overall SLA % indicates this code, the Senior line may be kept open, or a decision may be made not to close it, if hour-by-hour call volume looks normal despite the daily average. This is a judgment call made by the Associate Director of the Seniors or the Directors group, not a fixed rule tied to a specific number." },
+  red:    { open: false,
+    routing:   "Send all Senior questions to the Senior case queue.",
+    ownership: "Closing or reopening this line is owned by Training and Quality Leadership. If unavailable, the decision opens up to other OFS leadership.",
+    dailyRule: "Daily 4:00 p.m. rule — Regardless of call volume, the Senior phone line must be reopened at 4:00 p.m. and Seniors return to supporting it. Resuming off-phone / project work depends on volume and business need, but the line itself reopens at 4:00 p.m.",
+    discretion: "Leadership discretion — Even if the overall SLA % indicates this code, the Senior line may be kept open, or a decision may be made not to close it, if hour-by-hour call volume looks normal despite the daily average. This is a judgment call made by the Associate Director of the Seniors or the Directors group, not a fixed rule tied to a specific number." }
+};
+
+/* ---- Senior-specific messages (T&Q sends these) ---- */
+const seniorMessages = {
+  peak: {
+    closing: "Hi team, the Senior phone line is being closed and Seniors are moving to support the FSA queue. One Senior will be selected to stay out of the queue and continue covering the Senior chat and work on cases. A member of leadership will identify who that is and reach out directly.\n\nIf you have scheduled project time today, please be aware that it is reduced to 30 minutes to allow you to get some things completed without compromising coverage."
+  },
+  nonpeak: {
+    closing: "Hi team, the Senior phone line is being closed and Seniors are moving to support the FSA queue. One Senior will be selected to stay out of the queue and continue covering the Senior chat and work on cases. A member of leadership will identify who that is and reach out directly."
+  }
+};
+const seniorReopeningMsg = "Hi team, the Senior phone line is being reopened and you are moving back into your queue.";
+
+/* New — message sent directly to the specific Senior selected to cover
+   the chat and cases, setting clear expectations for that shift. */
+const seniorSelectedMsg = "Hi, you've been selected to focus on covering the Senior chat and cases. Please monitor the chat closely and respond to FSA questions as they come in. This will be your focus until 4:00 p.m. or otherwise communicated. If you need to take lunch or step away for any reason during this time, please let Training and Quality Leadership know so we can help manage coverage and communication.";
+
+/* ---- Leader broadcasts — now begin with "Hello Leaders," ---- */
+const leaderBroadcasts = {
+  peak: {
+    decreasing: {
+      green:  "Hello Leaders, during PEP, while we are in Code Green, we will not have any one on one, committee or team meetings. Once PEP is concluded we will return to them and notify you then.",
+      yellow: "Hello Leaders, we are in Code Yellow. FSAs should focus on phone calls only — no non-phone work, and minimize ACW. All meetings, shadowing, reverse shadowing, and mentoring are paused. Staffing Optimization will chat any FSA at 4+ minutes of ACW, 90+ minutes of AOT, or 45+ minutes of Lunch to return them to Ready.",
+      orange: "Hello Leaders, we are in Code Orange. In addition to Code Yellow: all non-phone work remains paused. Questions for Seniors should be sent by case or posted in the Senior chat. The Senior phone line is closed.",
+      red:    "Hello Leaders, we are in Code Red. All non-phone activity is cancelled. AOT continues. Please focus on calls, FSA ready status, and managing ACW. Questions for Seniors should be sent by case or posted in the Senior chat when the FSA does not have a student on the line."
+    },
+    improving: {
+      green:  "Hello Leaders, we are back to Code Green. Thank you for the team's work getting here. FSAs should continue focusing on phones and stay mindful of ACW.",
+      yellow: "Hello Leaders, we have improved to Code Yellow. Thank you. FSAs can resume shadowing, reverse shadowing, and mentoring. Committee and team meetings remain paused. Continue monitoring that FSAs stay Ready for our students.",
+      orange: "Hello Leaders, we have improved to Code Orange. This is great news for our students. Thank you. FSAs should remain focused on phone work and stay Ready. Staffing Optimization and managers continue monitoring ACW, AOT, and Lunch times to ensure FSAs are available for our students. Scheduled AOT can resume. The Senior phone line remains closed.",
+      red:    null
+    }
+  },
+  nonpeak: {
+    decreasing: {
+      green:  "Hello Leaders, we are in Code Green. We are pausing all committee and team meetings to assist with our call volume.",
+      yellow: "Hello Leaders, we are in Code Yellow. FSAs should focus on phone calls only — no non-phone work, and minimize ACW. All meetings are paused. Staffing Optimization will chat any FSA at 4+ minutes of ACW, 90+ minutes of AOT, or 45+ minutes of Lunch to return them to Ready.",
+      orange: "Hello Leaders, we are in Code Orange. In addition to Code Yellow: all non-phone work remains paused. Questions for Seniors should be sent by case or posted in the Senior chat. The Senior phone line is closed.",
+      red:    "Hello Leaders, we are in Code Red. All non-phone activity is cancelled. AOT continues. Please focus on calls, FSA ready status, and managing ACW. Questions for Seniors should be sent by case or posted in the Senior chat when the FSA does not have a student on the line."
+    },
+    improving: {
+      green:  "Hello Leaders, we are back to Code Green. Thank you for the team's work getting here. FSAs should continue focusing on phones and stay mindful of ACW.",
+      yellow: "Hello Leaders, we have improved to Code Yellow. Thank you. Committee and team meetings remain paused. Staffing Optimization and managers continue monitoring ACW, AOT, and Lunch times to ensure FSAs remain available for our students.",
+      orange: "Hello Leaders, we have improved to Code Orange. This is great news for our students. Thank you. FSAs should remain focused on phone work and stay Ready. Staffing Optimization and managers continue monitoring ACW, AOT, and Lunch times. Scheduled AOT can resume. The Senior phone line remains closed.",
+      red:    null
+    }
+  }
+};
+
+/* ---- FSA messages — Teams chat only, starting at Orange ---- */
+const fsaMessages = {
+  peak: {
+    decreasing: {
+      green:  null,
+      yellow: null,
+      orange: "Hello team, the Senior phone line is currently closed. If you have a question for a Senior, please submit a case or post your question in the Senior chat. As a reminder, the chat should only be used when you do not have a student on the line. All shadowing, mentoring, meetings, reverse shadowing, and project time remain paused.",
+      red:    null
+    },
+    improving: {
+      green:  null,
+      yellow: "The Senior phone line has been reopened. As always, please be mindful of hold times. Do not hold for more than 4 minutes. If hold time exceeds 4 minutes, please send a case to be reviewed.",
+      orange: null,
+      red:    null
+    }
+  },
+  nonpeak: {
+    decreasing: {
+      green:  null,
+      yellow: null,
+      orange: "Hello team, the Senior phone line is currently closed. If you have a question for a Senior, please submit a case or post your question in the Senior chat. As a reminder, the chat should only be used when you do not have a student on the line.",
+      red:    null
+    },
+    improving: {
+      green:  null,
+      yellow: "The Senior phone line has been reopened. As always, please be mindful of hold times. Do not hold for more than 4 minutes. If hold time exceeds 4 minutes, please send a case to be reviewed.",
+      orange: null,
+      red:    null
+    }
+  }
+};
+
+/* ---- Action steps — grouped by owner, cumulative by code ---- */
+const baseActions = {
+  green: [
+    { owner: "Both", text: "All these operations are paused during Peak regardless of SLA. During Non-Peak periods, they are enacted at SLA <80%." },
+    { owner: "Both", text: "No committee meetings." },
+    { owner: "Both", text: "No team meetings." },
+    { owner: "Both", text: "No non-essential meetings." },
+    { owner: "Both", text: "No 1-on-1s during Peak. Exception: in May, 1-on-1s may be held for Workday annual reviews or major issues only. During Non-Peak busy seasons, 1-on-1s continue." }
+  ],
+  yellow: [
+    { owner: "Both", text: "Pause all Non-Critical Work — all non-phone work." },
+    { owner: "T&Q",  text: "No term planning, shadowing, reverse shadowing, or mentoring during Peak. These activities remain during Non-Peak busy seasons." },
+    { owner: "Ops",  text: "Interviews continue." },
+    { owner: "Ops",  text: "AOT continues. (AOT applies to Ops FSAs and nesters — not to Seniors.) Note: if 50 or more calls are holding, leadership should consider canceling AOT. This is a judgment call — the tool cannot detect call volume." },
+    { owner: "Both", text: "FSA expectations: stay Ready/Available as much as possible; minimize After Call Work (ACW) time." },
+    { owner: "Ops",  text: "SOT monitors ACW: chats all FSAs at 4 min ACW, over 1.5 hr AOT, or over 45 min Lunch — to return to Ready." }
+  ],
+  orange: [
+    { owner: "Ops",  text: "Activate High Volume recorded IVR message during Non-Peak." },
+    { owner: "T&Q",  text: "Seniors join the FSA phone queue. One Senior stays out of the queue to cover the Senior chat and cases — leadership identifies who and reaches out directly." },
+    { owner: "Ops",  text: "All 6 Assistant Directors join the Senior chat." },
+    { owner: "T&Q",  text: "Senior phone line is closed. Closing or reopening this line is owned by Training and Quality Leadership. If unavailable, the decision opens up to other OFS leadership." },
+    { owner: "T&Q",  text: "All Associate Directors triage Senior cases as needed." },
+    { owner: "T&Q",  text: "All Associate Directors and the Director of Training and Quality will manage, coordinate, and facilitate all nesting and new-hire activities: meetings, coachings, all shadowing, reverse shadowing, and one-on-ones." },
+    { owner: "T&Q",  text: "All training is paused, including continued training and training that happens during nesting. If hour-by-hour SLA improves, training may resume in small groups rather than pulling the entire cohort at once. This decision will be at the discretion of leadership." },
+    { owner: "T&Q",  text: "All nesters and trainees ask their questions in their new-hire cohort Teams chat." },
+    { owner: "Ops",  text: "AOT continues. Note: if 50 or more calls are holding, leadership should consider canceling AOT." },
+    { owner: "Both", text: "Leadership may choose to move Seniors back to their own queue before the SLA% fully recovers if FSAs are sitting in Ready with time between calls. This is a judgment call in the moment." }
+  ],
+  red: [
+    { owner: "Both", text: "No new-hire or nesting support. (FSAs from both teams are the source of that support.)" },
+    { owner: "Ops",  text: "AOT continues. Note: if 50 or more calls are holding, leadership should consider canceling AOT." },
+    { owner: "Both", text: "The Directors will manage their ADs' team chats and provide their team members with updates." },
+    { owner: "Both", text: "Once 100 calls or more are holding: all Assistant Directors, all Associate Directors, all Directors, and the AVP join the FSA phone queue." },
+    { owner: "Both", text: "Once 50 calls or fewer are holding: all Assistant Directors, all Associate Directors, all Directors, and the AVP can leave the FSA phone queue." }
+  ]
+};
+
+const sotTemplate = "Hi [FSA Name], I am reaching out as part of the Workforce Team because you have been in ACW/Follow-Up for an extended amount of time. Do you have an issue you need assistance with? If so, please contact your supervisor. Otherwise, please return to Ready, as we currently have a queue and you are needed to assist students.";
+
+function actionsFor(code) {
+  const order = ["green", "yellow", "orange", "red"];
+  const idx = order.indexOf(code);
+  const allActions = [];
+  for (let i = 0; i <= idx; i++) allActions.push(...baseActions[order[i]]);
+  return {
+    tq:   allActions.filter(a => a.owner === "T&Q"),
+    ops:  allActions.filter(a => a.owner === "Ops"),
+    both: allActions.filter(a => a.owner === "Both")
+  };
+}
+
+const CODE_LABELS = { green: "Code Green", yellow: "Code Yellow", orange: "Code Orange", red: "Code Red" };
+function labelFor(c) { return CODE_LABELS[c]; }
+
+/* ============================================================
+   SCHEDULE DATA — 10 a.m. to 4 p.m. blocks
+   ============================================================ */
+const directorSchedule = [
+  { start: "10:00", end: "12:00", who: "Paige" },
+  { start: "12:00", end: "14:00", who: "Francesca" },
+  { start: "14:00", end: "16:00", who: "Siesonn" }
+];
+
+const adBackupSchedule = [
+  { start: "10:00", end: "11:00", who: "Sophia" },
+  { start: "11:00", end: "12:00", who: "Marc" },
+  { start: "12:00", end: "13:00", who: "Kandyss" },
+  { start: "13:00", end: "14:00", who: "Katilynn" },
+  { start: "14:00", end: "15:00", who: "Lisa" },
+  { start: "15:00", end: "16:00", who: "Haby" }
+];
+
+/* Assistant Dir Back Up 2 — second backup for the OFS Leadership chat,
+   official schedule from Francesca. */
+const adBackup2Schedule = [
+  { start: "10:00", end: "11:00", who: "Marc",     alt: "Katilynn" },
+  { start: "11:00", end: "12:00", who: "Kandyss",  alt: "Lisa" },
+  { start: "12:00", end: "13:00", who: "Katilynn", alt: "Haby" },
+  { start: "13:00", end: "14:00", who: "Lisa",     alt: "Sophia" },
+  { start: "14:00", end: "15:00", who: "Haby",     alt: "Marc" },
+  { start: "15:00", end: "16:00", who: "Sophia",   alt: "Kandyss" }
+];
+
+/* Senior Chat coverage — official schedule from Francesca.
+   One Senior is selected as primary each hour (identified live by
+   leadership). Grace and Akos (Associate Directors) back each other
+   up across two 3-hour shifts. The hourly AD names are only called
+   in if BOTH Associate Directors are out, each with an alternate in
+   case that AD already served as a back-up earlier in the day. */
+const seniorChatShifts = [
+  { start: "10:00", end: "13:00", primary: "Grace", secondary: "Akos" },
+  { start: "13:00", end: "16:00", primary: "Akos",  secondary: "Grace" }
+];
+/* NOTE: "If both Associate Dirs are out" reuses adBackup2Schedule directly —
+   it is the same rotation as Assistant Dir Back Up 2, not a separate list. */
+
+/* ============================================================
+   TIMING
+   ============================================================ */
+function getWindowStatus() {
+  const now = new Date();
+  const total = now.getHours() * 60 + now.getMinutes();
+  if (total < 600)  return "before"; // before 10:00 a.m.
+  if (total >= 960) return "after";  // at or after 4:00 p.m.
+  return "active";
+}
+
+/* ============================================================
+   CLASSIFY
+   ============================================================ */
+function classify(period, pct) {
+  if (typeof pct !== "number" || isNaN(pct)) return { code: null, reason: "no-input" };
+  if (pct < 0 || pct > 100) return { code: null, reason: "out-of-range" };
+  for (const r of ranges[period]) {
+    if (pct >= r.min) return { code: r.code, range: `${r.min}\u2013${r.max}%` };
+  }
+  return { code: null, reason: "no-match" };
+}
+
+function timeToMinutes(t) { const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+function findCurrent(schedule, nowMin) {
+  for (const s of schedule) {
+    const st = timeToMinutes(s.start), e = timeToMinutes(s.end);
+    if (nowMin >= st && nowMin < e) return s;
+  }
+  return null;
+}
+function prettyTime(t) {
+  const [h, m] = t.split(":").map(Number);
+  const ap = h < 12 ? "a" : "p";
+  let hh = h % 12; if (hh === 0) hh = 12;
+  return m === 0 ? `${hh}${ap}` : `${hh}:${String(m).padStart(2,"0")}${ap}`;
+}
+function fmtRange(s) { return `${prettyTime(s.start)}\u2013${prettyTime(s.end)}`; }
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+let state = { period: "peak", pct: null, inputError: null, enteredAt: null };
+
+function render() { renderResult(); renderCoverage(); renderTables(); }
+
+function setBodyTint(code) {
+  document.body.classList.remove("tint-green", "tint-yellow", "tint-orange", "tint-red");
+  if (code) document.body.classList.add("tint-" + code);
+}
+
+/* Code Quick Reference default state — when no valid SLA % is entered yet,
+   default that tab to Code Green with a note explaining it's a placeholder. */
+function showQuickRefDefault() {
+  const note = document.getElementById("noSlaNote");
+  if (note) note.style.display = "block";
+  if (window._lastAutoTab !== "green-default") {
+    window._lastAutoTab = "green-default";
+    selectCodeTab("green");
+  }
+}
+function hideQuickRefDefault() {
+  const note = document.getElementById("noSlaNote");
+  if (note) note.style.display = "none";
+}
+
+function renderResult() {
+  const zone = document.getElementById("resultZone");
+
+  const win = getWindowStatus();
+
+  if (state.inputError) {
+    zone.innerHTML = `<div class="card empty">Fix the input above to see the current code.</div>`;
+    setBodyTint(null);
+    showQuickRefDefault();
+    return;
+  }
+
+  const result = classify(state.period, state.pct);
+  if (result.reason === "no-input") {
+    zone.innerHTML = `<div class="card empty">Enter a current SLA % above to see the code and guidance.</div>`;
+    setBodyTint(null);
+    showQuickRefDefault();
+    return;
+  }
+  if (result.reason === "out-of-range" || result.reason === "no-match") {
+    zone.innerHTML = `<div class="card empty">Unable to classify — please review the SLA Agility Plan or confirm with leadership.</div>`;
+    setBodyTint(null);
+    showQuickRefDefault();
+    return;
+  }
+
+  const code = result.code;
+  setBodyTint(code);
+  hideQuickRefDefault();
+  const periodLabel = state.period === "peak" ? "Peak" : "Non-Peak";
+  const per = state.period;
+  const sl = seniorLine[code];
+  const fsaDecRaw = fsaMessages[per].decreasing[code];
+  // If SLA drops straight to Red (skipping Orange), FSAs still need the
+  // Senior-line closing instructions. Reuse the Orange message so it's
+  // always available to send, flagged clearly as the Orange-level message.
+  const fsaDec = (code === "red" && !fsaDecRaw) ? fsaMessages[per].decreasing["orange"] : fsaDecRaw;
+  const fsaDecIsReiterated = (code === "red" && !fsaDecRaw);
+  const fsaImp = fsaMessages[per].improving[code];
+  const ldrDec = leaderBroadcasts[per].decreasing[code];
+  const ldrImp = leaderBroadcasts[per].improving[code];
+  const showSeniorMsg = ["orange", "red"].includes(code);
+  const seniorClosingMsg = seniorMessages[per === "peak" ? "peak" : "nonpeak"].closing;
+
+  const isActiveNow = win === "active";
+  const statusPill = isActiveNow
+    ? `<div class="window-status window-status-active"><span aria-hidden="true">&#x2713;</span> Active &mdash; within the 10:00 a.m.\u20134:00 p.m. window</div>`
+    : `<div class="window-status window-status-inactive"><span aria-hidden="true">&#x25CF;</span> Not active &mdash; outside the 10:00 a.m.\u20134:00 p.m. window. Viewing for reference only.</div>`;
+
+  zone.innerHTML = `
+    ${statusPill}
+    <div class="result-card theme-${code}">
+      <div class="result-banner">
+        <div>
+          <div class="meta">${escapeHTML(periodLabel)} &bull; ${escapeHTML(String(state.pct))}% SLA</div>
+          <div class="code-line">
+            <span class="code">${escapeHTML(labelFor(code))}</span>
+            <span class="range">Range: ${escapeHTML(result.range)}</span>
+          </div>
+        </div>
+        <span class="leader-tag">Leader view</span>
+      </div>
+
+      <div class="result-body">
+
+        <!-- Resume at — elevated position -->
+        <div class="resume-block">
+          <span class="resume-label">Activities resume at</span>
+          <span class="resume-value">${escapeHTML(resumeAt[code])}</span>
+        </div>
+
+        <!-- Senior line -->
+        <div class="senior-line ${sl.open ? "open" : "closed"}">
+          <div class="sl-icon" aria-hidden="true">${sl.open ? "&#x2713;" : "&#x2715;"}</div>
+          <div class="senior-line-body">
+            <div class="sl-label">Senior Phone Line</div>
+            <div class="sl-status">${sl.open ? "OPEN" : "CLOSED"}</div>
+            ${sl.routing ? `<div class="sl-note">${escapeHTML(sl.routing)}</div>` : `<div class="sl-note">Seniors are taking phone calls as normal.</div>`}
+            ${sl.ownership ? `<div class="sl-ownership"><span aria-hidden="true">&#x26A0;</span><span>${escapeHTML(sl.ownership)}</span></div>` : ""}
+            ${sl.dailyRule ? `<div class="sl-daily"><span aria-hidden="true">&#x1F553;</span><span>${escapeHTML(sl.dailyRule)}</span></div>` : ""}
+            ${sl.discretion ? `<div class="sl-discretion"><span aria-hidden="true">&#x2696;</span><span>${escapeHTML(sl.discretion)}</span></div>` : ""}
+          </div>
+        </div>
+
+        <!-- Message accordion — one section open at a time, Leader open by default -->
+        <div class="msg-accordion">
+
+        <!-- 1. LEADER message -->
+        <div class="audience-section leader leader-context msg-accordion-item open">
+          <button type="button" class="msg-accordion-header" aria-expanded="true">
+            <span class="msg-accordion-headline"><span class="audience-tag">Leader-Only</span><span class="section-title">Message to Leaders</span></span>
+            <i class="msg-accordion-chevron" aria-hidden="true">&#9662;</i>
+          </button>
+          <div class="msg-accordion-body">
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">${code === "green" ? `While at Code Green, before the ${escapeHTML(resumeAt[code])} resume threshold` : "SLA dropping (entering / staying)"}</span>
+              <button class="copy-btn" data-copy="ldr-dec">Copy</button>
+            </div>
+            <div class="msg-box" id="ldr-dec">${escapeHTML(ldrDec)}</div>
+          </div>
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">${code === "green" ? `Once the ${escapeHTML(resumeAt[code])} resume threshold is met` : "SLA improving (returning)"}</span>
+              ${ldrImp ? `<button class="copy-btn" data-copy="ldr-imp">Copy</button>` : ""}
+            </div>
+            ${ldrImp
+              ? `<div class="msg-box" id="ldr-imp">${escapeHTML(ldrImp)}</div>`
+              : `<div class="msg-box muted">No improving message listed for Code Red in the plan.</div>`}
+          </div>
+          <p class="section-blurb" style="margin:12px 0 0;font-size:12px">For leadership action steps, see <button type="button" class="link-btn" data-goto-tab="quickref" data-goto-code="${code}">${escapeHTML(labelFor(code))} in Code Quick Reference</button>.</p>
+          </div>
+        </div>
+
+        <!-- 2. FSA messaging (Teams chat only, Orange+) -->
+        <div class="audience-section fsa msg-accordion-item">
+          <button type="button" class="msg-accordion-header" aria-expanded="false">
+            <span class="msg-accordion-headline"><span class="audience-tag">FSA-Facing &mdash; Teams chat only</span><span class="section-title">Message to FSAs</span></span>
+            <i class="msg-accordion-chevron" aria-hidden="true">&#9662;</i>
+          </button>
+          <div class="msg-accordion-body">
+          <p class="section-blurb">Plain language. No internal code mentioned. Post in Teams chat. FSA announcements start at Orange.</p>
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">${fsaDecIsReiterated ? "Senior line closing message (sent at Orange \u2014 send now if SLA dropped straight to Red)" : "SLA dropping (entering / staying)"}</span>
+              ${fsaDec ? `<button class="copy-btn" data-copy="fsa-dec">Copy</button>` : ""}
+            </div>
+            ${fsaDec
+              ? `<div class="msg-box" id="fsa-dec">${escapeHTML(fsaDec)}</div>`
+              : `<div class="msg-box muted">No FSA announcement at this level. FSA messaging starts at Orange. Yellow is monitored by leadership and Workforce only.</div>`}
+          </div>
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">SLA improving (returning)</span>
+              ${fsaImp ? `<button class="copy-btn" data-copy="fsa-imp">Copy</button>` : ""}
+            </div>
+            ${fsaImp
+              ? `<div class="msg-box" id="fsa-imp">${escapeHTML(fsaImp)}</div>`
+              : `<div class="msg-box muted">${code === "red" ? "No additional FSA message for Code Red — the Orange closing message remains posted. Post the reopening message when returning to Yellow." : "No FSA announcement at this level."}</div>`}
+          </div>
+          </div>
+        </div>
+
+        <!-- 3. Senior messaging (T&Q only, Orange+) -->
+        ${showSeniorMsg ? `
+        <div class="audience-section seniors msg-accordion-item">
+          <button type="button" class="msg-accordion-header" aria-expanded="false">
+            <span class="msg-accordion-headline"><span class="audience-tag">Seniors &mdash; T&amp;Q sends this</span><span class="section-title">Message to Seniors</span></span>
+            <i class="msg-accordion-chevron" aria-hidden="true">&#9662;</i>
+          </button>
+          <div class="msg-accordion-body">
+          <p class="section-blurb">Post in the Seniors Teams chat. Sent by Training and Quality Leadership.</p>
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">${code === "red" ? "Senior line closing message (sent at Orange \u2014 line remains closed)" : "When closing the Senior line (Orange)"}</span>
+              <button class="copy-btn" data-copy="senior-closing">Copy</button>
+            </div>
+            <div class="msg-box" id="senior-closing">${escapeHTML(seniorClosingMsg)}</div>
+          </div>
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">When reopening the Senior line (returning to Yellow)</span>
+              <button class="copy-btn" data-copy="senior-reopening">Copy</button>
+            </div>
+            <div class="msg-box" id="senior-reopening">${escapeHTML(seniorReopeningMsg)}</div>
+          </div>
+          <div class="msg-block">
+            <div class="msg-label">
+              <span class="label-text">To the specific Senior selected for chat/cases</span>
+              <button class="copy-btn" data-copy="senior-selected">Copy</button>
+            </div>
+            <div class="msg-box" id="senior-selected">${escapeHTML(seniorSelectedMsg)}</div>
+          </div>
+          </div>
+        </div>
+        ` : ""}
+
+        </div>
+
+      </div>
+    </div>`;
+
+  // R1: auto-highlight the active code's tab so action steps are one glance away
+  if (window._lastAutoTab !== code) {
+    window._lastAutoTab = code;
+    selectCodeTab(code);
+  }
+}
+
+/* Single delegated listener — safe across re-renders, no listener stacking. */
+function markCopied(btn) {
+  btn.textContent = "Copied";
+  btn.classList.add("copied");
+  clearTimeout(btn._copyTimer);
+  btn._copyTimer = setTimeout(() => {
+    btn.textContent = "Copy";
+    btn.classList.remove("copied");
+  }, 1500);
+}
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".copy-btn");
+  if (!btn) return;
+  const target = document.getElementById(btn.dataset.copy);
+  if (!target) return;
+  const text = target.innerText;
+  navigator.clipboard.writeText(text).then(() => markCopied(btn)).catch(() => {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); markCopied(btn); } catch(err) {}
+    document.body.removeChild(ta);
+  });
+});
+
+/* Message accordion — clicking a header opens it and closes the others
+   within the same accordion. Delegated so it survives re-renders. */
+document.addEventListener("click", e => {
+  const header = e.target.closest(".msg-accordion-header");
+  if (!header) return;
+  const item = header.closest(".msg-accordion-item");
+  const wrap = header.closest(".msg-accordion");
+  if (!item || !wrap) return;
+  const wasOpen = item.classList.contains("open");
+  wrap.querySelectorAll(".msg-accordion-item").forEach(i => {
+    i.classList.remove("open");
+    i.querySelector(".msg-accordion-header")?.setAttribute("aria-expanded", "false");
+  });
+  if (!wasOpen) {
+    item.classList.add("open");
+    header.setAttribute("aria-expanded", "true");
+  }
+});
+
+/* Top-level tabs — Live Lookup / Reference */
+function switchTopTab(tab) {
+  document.querySelectorAll(".top-tab-btn").forEach(b => {
+    const isActive = b.dataset.tab === tab;
+    b.classList.toggle("active", isActive);
+    b.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+  document.getElementById("panel-live").classList.toggle("active", tab === "live");
+  document.getElementById("panel-quickref").classList.toggle("active", tab === "quickref");
+  document.getElementById("panel-reference").classList.toggle("active", tab === "reference");
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+document.querySelectorAll(".top-tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchTopTab(btn.dataset.tab));
+});
+
+/* Arrow-key navigation across the top-level tabs, per standard tablist behavior */
+const TOP_TAB_ORDER = ["live", "quickref", "reference"];
+document.querySelectorAll(".top-tab-btn").forEach(btn => {
+  btn.addEventListener("keydown", e => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault();
+    const idx = TOP_TAB_ORDER.indexOf(btn.dataset.tab);
+    const nextIdx = e.key === "ArrowRight"
+      ? (idx + 1) % TOP_TAB_ORDER.length
+      : (idx - 1 + TOP_TAB_ORDER.length) % TOP_TAB_ORDER.length;
+    const nextTab = TOP_TAB_ORDER[nextIdx];
+    switchTopTab(nextTab);
+    document.getElementById("tabbtn-" + nextTab).focus();
+  });
+});
+
+/* "See [Code] in the Quick Reference tab" links inside the result — switches
+   to the Quick Reference tab and opens the matching code's panel. */
+document.addEventListener("click", e => {
+  const link = e.target.closest("[data-goto-tab]");
+  if (!link) return;
+  switchTopTab(link.dataset.gotoTab);
+  if (link.dataset.gotoCode) selectCodeTab(link.dataset.gotoCode);
+  document.getElementById("sec-reference")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+function renderCoverage() {
+  const wrap = document.getElementById("coverageNow");
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const nowLabel = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+  const dir  = findCurrent(directorSchedule, nowMin);
+  const adb  = findCurrent(adBackupSchedule, nowMin);
+  const adb2 = findCurrent(adBackup2Schedule, nowMin);
+  const shift = findCurrent(seniorChatShifts, nowMin);
+
+  function card(role, slot, note) {
+    if (!slot) {
+      return `<div class="who-card outside">
+        <div class="role">${escapeHTML(role)}</div>
+        <div class="name">Outside active window</div>
+        <div class="time">Now: ${escapeHTML(nowLabel)}</div>
+      </div>`;
+    }
+    return `<div class="who-card">
+      <div class="role">${escapeHTML(role)}</div>
+      <div class="name">${escapeHTML(slot.primary || slot.who)}</div>
+      <div class="time">${escapeHTML(fmtRange(slot))} &mdash; now ${escapeHTML(nowLabel)}</div>
+      ${note ? `<div class="note-sm">${escapeHTML(note)}</div>` : ""}
+    </div>`;
+  }
+
+  // Assistant Dir Back Up card — 2nd backup shown as a small note underneath,
+  // same pattern as the Senior card below, since it's the same AD covering
+  // as 2nd backup this hour before becoming 1st backup the following hour.
+  const adBackupNote = adb2 ? `2nd backup: ${adb2.who}` : null;
+
+  // Senior in chat card (10am-4pm, identified day-of) — shows today's
+  // primary/secondary Associate Director backups (Grace / Akos)
+  const seniorActive = nowMin >= 600 && nowMin < 960;
+  const shiftNote = (seniorActive && shift)
+    ? `Back up: ${shift.primary}, then ${shift.secondary}. If both are out, see the full schedule for the hourly AD back-up.`
+    : "One Senior held back — leadership reaches out directly.";
+  const seniorCard = `<div class="who-card ${seniorActive ? "" : "outside"}">
+    <div class="role">Senior in Chat &amp; Cases</div>
+    <div class="name">${seniorActive ? "Identified by leadership" : "Outside active window"}</div>
+    <div class="time">10a\u20134p \u2014 now ${escapeHTML(nowLabel)}</div>
+    ${seniorActive ? `<div class="note-sm">${escapeHTML(shiftNote)}</div>` : ""}
+  </div>`;
+
+  wrap.innerHTML = card("Director on duty", dir, null)
+    + card("Assistant Dir Back Up", adb, adBackupNote)
+    + seniorCard;
+}
+
+function renderTables() {
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  let dt = `<thead><tr><th>Block</th><th>Director</th></tr></thead><tbody>`;
+  directorSchedule.forEach(s => {
+    const isNow = nowMin >= timeToMinutes(s.start) && nowMin < timeToMinutes(s.end);
+    dt += `<tr class="${isNow ? "now" : ""}"><td>${escapeHTML(fmtRange(s))}</td><td>${escapeHTML(s.who)}</td></tr>`;
+  });
+  dt += `</tbody>`;
+  document.getElementById("dirTable").innerHTML = dt;
+
+  let abu = `<thead><tr><th>Block</th><th>Assistant Dir Back Up</th></tr></thead><tbody>`;
+  adBackupSchedule.forEach(s => {
+    const isNow = nowMin >= timeToMinutes(s.start) && nowMin < timeToMinutes(s.end);
+    abu += `<tr class="${isNow ? "now" : ""}"><td>${escapeHTML(fmtRange(s))}</td><td>${escapeHTML(s.who)}</td></tr>`;
+  });
+  abu += `</tbody>`;
+  document.getElementById("adBackupTable").innerHTML = abu;
+
+  let abu2 = `<thead><tr><th>Block</th><th>Assistant Dir Back Up 2</th></tr></thead><tbody>`;
+  adBackup2Schedule.forEach(s => {
+    const isNow = nowMin >= timeToMinutes(s.start) && nowMin < timeToMinutes(s.end);
+    abu2 += `<tr class="${isNow ? "now" : ""}">
+      <td>${escapeHTML(fmtRange(s))}</td>
+      <td>${escapeHTML(s.who)}<br><span style="font-style:italic;color:var(--ink-mute);font-size:12px">${escapeHTML(s.alt)}*</span></td>
+    </tr>`;
+  });
+  abu2 += `</tbody>`;
+  document.getElementById("adBackup2Table").innerHTML = abu2;
+
+  // Senior Chat table: Block | Sr. in the Chat | Shift | Back Up Associate Dir |
+  // Back Up Associate Dir 2 | If both Associate Dirs are out
+  let sct = `<thead><tr>
+    <th>Block</th><th>Sr. in the Chat</th><th>Shift</th>
+    <th>Back Up Associate Dir</th><th>Back Up Associate Dir 2</th>
+    <th>If both Associate Dirs are out</th>
+  </tr></thead><tbody>`;
+
+  sct += `<tr style="font-style:italic;color:var(--ink-mute);background:#fafbfc">
+    <td>8a\u201310a</td><td colspan="5">Seniors in Chat and Sr. Phone Line</td>
+  </tr>`;
+
+  seniorChatShifts.forEach(shift => {
+    const hours = adBackup2Schedule.filter(h =>
+      timeToMinutes(h.start) >= timeToMinutes(shift.start) &&
+      timeToMinutes(h.start) < timeToMinutes(shift.end)
+    );
+    hours.forEach((h, i) => {
+      const isNow = nowMin >= timeToMinutes(h.start) && nowMin < timeToMinutes(h.end);
+      sct += `<tr class="${isNow ? "now" : ""}">
+        <td>${escapeHTML(fmtRange(h))}</td>
+        <td>1 Selected Senior</td>
+        ${i === 0 ? `
+          <td rowspan="${hours.length}">${escapeHTML(fmtRange(shift))}</td>
+          <td rowspan="${hours.length}">${escapeHTML(shift.primary)}</td>
+          <td rowspan="${hours.length}">${escapeHTML(shift.secondary)}</td>
+        ` : ""}
+        <td>${escapeHTML(h.who)}<br><span style="font-style:italic;color:var(--ink-mute);font-size:12px">${escapeHTML(h.alt)}*</span></td>
+      </tr>`;
+    });
+  });
+
+  sct += `<tr style="font-style:italic;color:var(--ink-mute);background:#fafbfc">
+    <td>4p\u20138p</td><td colspan="5">Seniors in Chat and Sr. Phone Line</td>
+  </tr>`;
+
+  sct += `</tbody>`;
+  document.getElementById("seniorChatTable").innerHTML = sct;
+}
+
+/* ============================================================
+   CODE TABS
+   ============================================================ */
+function renderTabPanel(code) {
+  const sl = seniorLine[code];
+  const acts = actionsFor(code);
+  const showSOTTab = ["yellow","orange","red"].includes(code);
+
+  function ownerGroup(label, cls, items) {
+    if (!items.length) return "";
+    const lis = items.map(it => `<li>${escapeHTML(it.text)}</li>`).join("");
+    return `<div class="actions-owner-group">
+      <div class="owner-group-header"><span class="owner-pill ${cls}">${escapeHTML(label)}</span></div>
+      <ul class="owner-actions">${lis}</ul>
+    </div>`;
+  }
+  const actHTML = ownerGroup("T&Q","owner-tq",acts.tq)
+    + ownerGroup("Ops","owner-ops",acts.ops)
+    + ownerGroup("Both","owner-both",acts.both);
+
+  const slNote = sl.open
+    ? `<p class="tab-note">&#x2713; Senior phone line: OPEN</p>`
+    : `<p class="tab-note">&#x2715; Senior phone line: CLOSED &mdash; ${escapeHTML(sl.routing || "")} Owned by Training and Quality Leadership. ${sl.dailyRule ? "Reopens at 4:00 p.m. regardless of call volume." : ""} ${sl.discretion ? "Leadership may keep it open, or choose not to close it, if hourly volume looks normal despite the daily average \u2014 at Training and Quality Leadership's discretion." : ""}</p>`;
+
+  const sotHTML = showSOTTab ? `
+    <div style="margin-top:14px;border-top:1px solid rgba(0,0,0,0.1);padding-top:14px">
+      <div class="owner-group-header"><span class="owner-pill owner-ops">Ops</span> SOT outreach template</div>
+      <p style="font-size:12px;color:var(--ink-mute);margin:0 0 6px">1-on-1 to an FSA in extended ACW / AOT / Lunch.</p>
+      <div class="msg-label" style="justify-content:flex-end">
+        <button class="copy-btn" data-copy="tab-sot-${code}">Copy</button>
+      </div>
+      <div class="template-box" id="tab-sot-${code}" style="font-size:13px">${escapeHTML(sotTemplate)}</div>
+    </div>` : "";
+
+  document.getElementById("tabPanel-" + code).innerHTML = `
+    <h4>${escapeHTML(CODE_LABELS[code])} &mdash; cumulative action steps</h4>
+    ${slNote}
+    <div class="owner-key" style="margin:10px 0 8px">
+      <span class="owner-key-label">Owner:</span>
+      <span class="owner-pill owner-tq">T&amp;Q</span> Training &amp; Quality &nbsp;
+      <span class="owner-pill owner-ops">Ops</span> Operations &nbsp;
+      <span class="owner-pill owner-both">Both</span> Both teams
+    </div>
+    ${actHTML}
+    ${sotHTML}
+  `;
+}
+
+function selectCodeTab(tab) {
+  document.querySelectorAll(".code-tab").forEach(b => {
+    const isActive = b.dataset.tab === tab;
+    b.classList.toggle("active", isActive);
+    b.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("visible"));
+  renderTabPanel(tab);
+  document.getElementById("tabPanel-" + tab).classList.add("visible");
+}
+
+function closeCodeTabs() {
+  document.querySelectorAll(".code-tab").forEach(b => {
+    b.classList.remove("active");
+    b.setAttribute("aria-selected", "false");
+  });
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("visible"));
+}
+document.querySelectorAll(".code-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("active")) closeCodeTabs();   // toggle closed
+    else selectCodeTab(btn.dataset.tab);
+  });
+});
+
+/* ============================================================
+   INPUT VALIDATION + WIRE UP
+   ============================================================ */
+function escapeHTML(s) {
+  if (s == null) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+const pctInput   = document.getElementById("pctInput");
+const inputError = document.getElementById("inputError");
+
+function validateAndSet(raw) {
+  state.inputError = null;
+  pctInput.classList.remove("invalid");
+  inputError.classList.remove("show");
+  inputError.textContent = "";
+  if (raw === "" || raw == null) { state.pct = null; state.enteredAt = null; return; }
+  const n = parseFloat(raw);
+  if (isNaN(n))  { state.pct = null; state.enteredAt = null; state.inputError = "Please enter a number."; }
+  else if (n < 0)   { state.pct = null; state.enteredAt = null; state.inputError = "Percentage cannot be below 0. Please enter a value between 0 and 100."; }
+  else if (n > 100) { state.pct = null; state.enteredAt = null; state.inputError = "Percentage cannot be above 100. Please enter a value between 0 and 100."; }
+  else { state.pct = n; state.enteredAt = new Date(); }
+  if (state.inputError) {
+    pctInput.classList.add("invalid");
+    inputError.textContent = state.inputError;
+    inputError.classList.add("show");
+  }
+}
+
+/* "You entered this at [time]" timestamp — plain under 30 minutes, amber
+   warning past 30 minutes prompting a recheck of the Five9 report. Also
+   toggles the Clear link's visibility alongside it. */
+function updateEnteredAtDisplay() {
+  const el = document.getElementById("enteredAt");
+  const clearBtn = document.getElementById("clearPctBtn");
+  if (!el || !clearBtn) return;
+  if (!state.enteredAt) {
+    el.style.display = "none";
+    clearBtn.style.display = "none";
+    return;
+  }
+  clearBtn.style.display = "inline-block";
+  const minsAgo = (Date.now() - state.enteredAt.getTime()) / 60000;
+  const timeLabel = state.enteredAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  if (minsAgo >= 30) {
+    el.textContent = `You entered this at ${timeLabel} — over 30 minutes ago. Recheck the Five9 report.`;
+    el.classList.add("stale");
+  } else {
+    el.textContent = `You entered this at ${timeLabel}`;
+    el.classList.remove("stale");
+  }
+  el.style.display = "block";
+}
+
+document.querySelectorAll("#periodToggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#periodToggle button").forEach(b => {
+      b.classList.remove("active");
+      b.setAttribute("aria-pressed", "false");
+    });
+    btn.classList.add("active");
+    btn.setAttribute("aria-pressed", "true");
+    state.period = btn.dataset.val;
+    render();
+  });
+});
+
+pctInput.addEventListener("input", e => { validateAndSet(e.target.value.trim()); updateEnteredAtDisplay(); render(); });
+pctInput.addEventListener("keydown", e => { if (["e","E","+"].includes(e.key)) e.preventDefault(); });
+
+document.getElementById("clearPctBtn").addEventListener("click", () => {
+  pctInput.value = "";
+  validateAndSet("");
+  updateEnteredAtDisplay();
+  render();
+  pctInput.focus();
+});
+
+let _lastWindowStatus = getWindowStatus();
+setInterval(() => {
+  renderCoverage();
+  renderTables();
+  updateEnteredAtDisplay();   // keeps the 30-minute staleness check live
+  const ws = getWindowStatus();
+  if (ws !== _lastWindowStatus) {   // R4: only touch the result at 10:00 / 4:00 boundaries
+    _lastWindowStatus = ws;
+    renderResult();
+  }
+}, 60 * 1000);
+
+/* Auto-default Period to match today's real-world month — Peak for
+   January, May, August; Non-Peak otherwise. Still manually overridable. */
+(function autoDefaultPeriod() {
+  const month = new Date().getMonth(); // 0 = Jan, 4 = May, 7 = Aug
+  const targetVal = [0, 4, 7].includes(month) ? "peak" : "nonpeak";
+  state.period = targetVal;
+  document.querySelectorAll("#periodToggle button").forEach(b => {
+    const match = b.dataset.val === targetVal;
+    b.classList.toggle("active", match);
+    b.setAttribute("aria-pressed", match ? "true" : "false");
+  });
+})();
+
+render();
+</script>
+</body>
+</html>
